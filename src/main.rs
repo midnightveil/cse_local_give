@@ -23,19 +23,27 @@ fn main() {
         println!("Problem parsing arguments: {}", err);
         process::exit(1);
     });
-    
+
     let xdg_dirs = BaseDirectories::with_prefix(PACKAGE_NAME).unwrap();
     let config_path = xdg_dirs.place_config_file("zID").unwrap_or_else(|err| {
         println!("Could not fetch configuration directory: {}", err);
         process::exit(1);
     });
     let mut config_file = File::open(&config_path).unwrap_or_else(|err| {
-        println!("Could not open zID config file ({}): {}", config_path.display(), err);
+        println!(
+            "Could not open zID config file ({}): {}",
+            config_path.display(),
+            err
+        );
         process::exit(1);
     });
     let mut z_id = String::new();
     config_file.read_to_string(&mut z_id).unwrap_or_else(|err| {
-        println!("Could not read zID config file({}): {}", config_path.display(), err);
+        println!(
+            "Could not read zID config file({}): {}",
+            config_path.display(),
+            err
+        );
         process::exit(1);
     });
     let z_id = z_id.trim();
@@ -43,7 +51,7 @@ fn main() {
     let local_files_folder = env::current_dir().unwrap();
 
     // Connect to the SSH server
-    let tcp = TcpStream::connect(&format!("{}:22", SERVER_URL)).unwrap();
+    let tcp = TcpStream::connect(format!("{}:22", SERVER_URL)).unwrap();
     let mut sess = Session::new().unwrap();
     sess.set_tcp_stream(tcp);
     sess.handshake().unwrap();
@@ -88,7 +96,7 @@ fn main() {
     sftp.mkdir(path, 0o770).unwrap();
     for file in config.files {
         let mut v = Vec::new();
-        File::open(&local_files_folder.join(file))
+        File::open(local_files_folder.join(file))
             .unwrap()
             .read_to_end(&mut v)
             .unwrap();

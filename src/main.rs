@@ -125,7 +125,10 @@ impl Config<'_> {
             2 => Err("Assignment not specified"),
             3 => Err("No files specified"),
             _ => {
-                let class = args[1].clone();
+                // We run `${class} classrun`, but often it is specified as
+                // `cs${class} give`, so strip leading `cs` to not give a
+                // confusing error that no valid assignments were found.
+                let class = args[1].clone().trim_start_matches("cs").to_string();
                 let assignment = args[2].clone();
                 let files = &args[3..];
                 if files
